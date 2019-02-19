@@ -109,6 +109,6 @@ public class StdDrawDemo {
 		* notice the differences. */
 		drawThree();
 		drawRandom();
-		drawZoom();
+		// drawZoom();
 	}
 }
