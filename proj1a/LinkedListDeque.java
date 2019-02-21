@@ -9,7 +9,7 @@ public class LinkedListDeque<T> {
         public T item;
         public StuffNode next;
 
-        public StuffNode(StuffNode p,T i, StuffNode n){
+        private StuffNode(StuffNode p,T i, StuffNode n){
             prev = p;
             item = i;
             next = n;
@@ -39,8 +39,8 @@ public class LinkedListDeque<T> {
         sentinel.prev = sentinel;
         size = 0;
         T myNew;
-        for(int i = 0;i < other.size; i ++ ){
-            myNew = (T)other.get(i);    // use (T) for casting
+        for(int i = 0;i < other.size; i++ ){
+            myNew = (T) other.get(i);    // use (T) for casting
             this.addLast(myNew);
         }
     }
@@ -140,14 +140,14 @@ public class LinkedListDeque<T> {
     }
 
     /* helper method for getRecursion */
-    private T MygetRecursive (StuffNode S, int myindex){
+    private T myGetRecursive (StuffNode S, int myindex){
         if(myindex >= size){
             System.out.println("index should be less than size!");
             return null;}
         else if(myindex == 0){
             return S.item;
         }
-        return MygetRecursive(S.next, myindex-1 );
+        return myGetRecursive(S.next, myindex-1 );
     }
 
     /**  Same as get, but uses recursion.
@@ -157,7 +157,7 @@ public class LinkedListDeque<T> {
      */
     public T getRecursive(int index){
         StuffNode Stuff = sentinel;
-        return MygetRecursive(Stuff.next,index);
+        return myGetRecursive(Stuff.next,index);
     }
 
 

@@ -2,6 +2,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+/** Modified by Yue */
+
 public class IntListTest {
 
     /**
@@ -69,5 +71,25 @@ public class IntListTest {
     /** If you're running this from the command line, you'll need
       * to add a main method. See ArithmeticTest.java for an
       * example. */
+
+
+    /** Test three cases:
+     * That the function returns a reversed list.
+     That the function is destructive, i.e. when it is done running, the list pointed to by A has been tampered with. You can use assertNotEquals. This is sort of a silly test.
+     That the method handles a null input properly.
+     */
+    @Test(timeout = 1000)
+    public void testReverse() {
+        IntList A = IntList.of(1,2,3);
+        IntList original = IntList.of(1,2,3);
+        IntList exp = IntList.of(3,2,1);
+        assertEquals(exp, IntList.reverse(A));
+        assertNotEquals(A,original );
+
+        IntList B = IntList.of();
+        IntList exp2 = null;
+        assertEquals(exp2, IntList.reverse(B));
+
+    }
 
 }
