@@ -3,7 +3,7 @@
  * @author Yue Hu
  */
 
-public class LinkedListDeque<T> {
+public class LinkedListDeque<T> implements Deque<T> {
     private class StuffNode{
         public  StuffNode prev;
         public T item;
@@ -49,6 +49,7 @@ public class LinkedListDeque<T> {
      *
      * @param item item to be addded
      */
+    @Override
     public void addFirst(T item){
         sentinel.next = new StuffNode(sentinel, item, sentinel.next);
         sentinel.next.next.prev = sentinel.next;
@@ -59,27 +60,19 @@ public class LinkedListDeque<T> {
      *
      * @param item item to be added
      */
+    @Override
     public void addLast(T item){
         sentinel.prev = new StuffNode(sentinel.prev, item, sentinel);
         sentinel.prev.prev.next = sentinel.prev;
         size += 1;
     }
 
-    /**  Returns true if deque is empty, false otherwise.
-     *
-     * @return boolean value
-     */
-    public boolean isEmpty(){
-        if(size > 0){
-            return false;
-        }
-        return true;
-    }
 
     /** Returns the number of items in the deque.
      *
      * @return size of the List
      */
+    @Override
     public int size(){
         return size;
     }
@@ -87,6 +80,7 @@ public class LinkedListDeque<T> {
     /** Prints the items in the deque from first to last, separated by a space. Once all the items have been printed, print out a new line.
      *
      */
+    @Override
     public void printDeque(){
         StuffNode S = sentinel;
         int k = size;
@@ -102,6 +96,7 @@ public class LinkedListDeque<T> {
      *
      * @return the first
      */
+    @Override
     public T removeFirst(){
         T myitem = sentinel.next.item;
         sentinel.next = sentinel.next.next;
@@ -114,6 +109,7 @@ public class LinkedListDeque<T> {
      *
      * @return the last
      */
+    @Override
     public T removeLast(){
         T myitem = sentinel.prev.item;
         sentinel.prev = sentinel.prev.prev;
@@ -126,6 +122,7 @@ public class LinkedListDeque<T> {
      * @param index an int
      * @return a value
      */
+    @Override
     public T get(int index){
         if(index >= size){
             System.out.println("index should be less than size!");
