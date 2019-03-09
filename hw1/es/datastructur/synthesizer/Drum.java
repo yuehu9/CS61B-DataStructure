@@ -1,23 +1,21 @@
 package es.datastructur.synthesizer;
 
-public class GuitarString {
-    /** Constants. Do not change. In case you're curious, the keyword final
-     * means the values cannot be changed at runtime. */
+public class Drum {
     private static final int SR = 44100;      // Sampling Rate
-    private static final double DECAY = .996; // energy decay factor
+    private static final double DECAY = 1; // energy decay factor
 
     /* Buffer for storing sound data. */
     private BoundedQueue<Double> buffer;
 
     /* Create a guitar string of the given frequency.  */
-    public GuitarString(double frequency) {
+    public Drum(double frequency) {
         // Create a buffer with capacity = SR / frequency. You'll need to
         //       cast the result of this division operation into an int. For
         //       better accuracy, use the Math.round() function before casting.
         //       Your buffer should be initially filled with zeros.
-        int capacity = (int) Math.round(SR / frequency);
+        int capacity = (int) Math.round(SR/frequency);
         buffer = new ArrayRingBuffer<Double>(capacity);
-        while (buffer.fillCount() != capacity) {
+        while(buffer.fillCount() != capacity) {
             buffer.enqueue(0.);
         }
     }
@@ -30,11 +28,9 @@ public class GuitarString {
         //       double r = Math.random() - 0.5;
         //
         //TODO     Make sure that your random numbers are different from each
-
-        for (int i = 0; i < buffer.capacity(); i++) {
+        for (int i =0; i < buffer.capacity(); i++) {
             buffer.dequeue();
             double r = Math.random() - 0.5;
-
             buffer.enqueue(r);
         }
 
@@ -46,7 +42,11 @@ public class GuitarString {
     public void tic() {
         double front = buffer.dequeue();
         front = DECAY * (front + buffer.peek()) / 2;
-        buffer.enqueue(front);
+        if (Math.random() < 0.5) {
+            buffer.enqueue(-1 * front);
+        } else {
+            buffer.enqueue(front);
+        }
     }
 
     /* Return the double at the front of the buffer. */
