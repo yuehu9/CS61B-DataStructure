@@ -12,16 +12,16 @@ public class TestArrayRingBuffer {
         ArrayRingBuffer<Integer> ab = new ArrayRingBuffer<>(3);
         ab.enqueue(3);
         int fir = ab.peek();
-        assertEquals(3,fir);
+        assertEquals(3, fir);
 
         ab.enqueue(2);
         fir = ab.dequeue();
-        assertEquals(3,fir);
+        assertEquals(3, fir);
         ab.enqueue(4);
         ab.enqueue(5);
 
         fir = ab.peek();
-        assertEquals(2,fir);
+        assertEquals(2, fir);
 
 //        ab.enqueue(3);
 
