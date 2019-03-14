@@ -67,6 +67,22 @@ public class BST<Key extends Comparable<Key>> {
     }
 
 
+    /** helper method for depth */
+    public double depthToNode(Node n) {
+        if (n == null) return 0;
+        double sumDepth = (double) depthToNode(n.left) + depthToNode(n.right) + n.size - 1;
+        return sumDepth;
+    }
+
+    /** calculates average depth of the tree
+    public double depthSum() {
+        return depthToNode(root);
+    }
+*/
+    public double depthAv() {
+        return depthToNode(root) / root.size;
+    }
+
     /** Private methods and variables follow. There's no need to read
      *  any of this.
      */
