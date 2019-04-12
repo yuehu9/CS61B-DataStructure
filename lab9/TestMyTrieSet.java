@@ -29,13 +29,14 @@ public class TestMyTrieSet {
         assertFalse(t.contains("waterYouDoingHere"));
         t.add("waterYouDoingHere");
         assertTrue(t.contains("waterYouDoingHere"));
+        assertFalse(t.contains("wefsdf"));
     }
 
     // assumes add works
     @Test
     public void sanityPrefixTest() {
         String[] saStrings = new String[]{"same", "sam", "sad", "sap"};
-        String[] otherStrings = new String[]{"a", "awls", "hello"};
+        String[] otherStrings = new String[]{"a", "awls", "ahello"};
 
         MyTrieSet t = new MyTrieSet();
         for (String s: saStrings) {
@@ -45,14 +46,15 @@ public class TestMyTrieSet {
             t.add(s);
         }
 
-        List<String> keys = t.keysWithPrefix("sa");
+        List<String> keys = t.keysWithPrefix("a");
         for (String s: saStrings) {
-            assertTrue(keys.contains(s));
-        }
-        for (String s: otherStrings) {
             assertFalse(keys.contains(s));
         }
+        for (String s: otherStrings) {
+            assertTrue(keys.contains(s));
+        }
     }
+
 
     public static void main(String[] args) {
         jh61b.junit.TestRunner.runTests(TestMyTrieSet.class);
