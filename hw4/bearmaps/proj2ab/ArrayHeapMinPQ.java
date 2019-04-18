@@ -26,9 +26,9 @@ public class ArrayHeapMinPQ<T> implements ExtrinsicMinPQ<T> {
         itemMap = new HashMap<>(capacity);
     }
 
-    /** Initialize an empty pq */
+    /** Initialize a pq without specialzed capacity */
     public ArrayHeapMinPQ() {
-        this(1);
+        this(8);
     }
 
     @Override
