@@ -1,5 +1,9 @@
 import edu.princeton.cs.algs4.Queue;
 
+/** modified by Yue hu
+ *  April 2019
+ */
+
 public class MergeSort {
     /**
      * Removes and returns the smallest item that is in q1 or q2.
@@ -42,8 +46,13 @@ public class MergeSort {
      */
     private static <Item extends Comparable> Queue<Queue<Item>>
             makeSingleItemQueues(Queue<Item> items) {
-        // Your code here!
-        return null;
+        Queue<Queue<Item>> singleQue = new Queue<>();
+        for (Item item : items) {
+            Queue<Item> tempQue = new Queue<>();
+            tempQue.enqueue(item);
+            singleQue.enqueue(tempQue);
+        }
+        return singleQue;
     }
 
     /**
@@ -61,8 +70,12 @@ public class MergeSort {
      */
     private static <Item extends Comparable> Queue<Item> mergeSortedQueues(
             Queue<Item> q1, Queue<Item> q2) {
-        // Your code here!
-        return null;
+        Queue<Item> mergedQue = new Queue<>();
+        while (!q1.isEmpty() || !q2.isEmpty()) {
+            Item min = getMin(q1, q2);
+            mergedQue.enqueue(min);
+        }
+        return mergedQue;
     }
 
     /**
@@ -77,7 +90,33 @@ public class MergeSort {
      */
     public static <Item extends Comparable> Queue<Item> mergeSort(
             Queue<Item> items) {
-        // Your code here!
-        return items;
+        int N = items.size();
+        if(N <= 1) { return items; }
+        Queue<Queue<Item>> singleQue = makeSingleItemQueues(items);
+        int a = N / 2;
+        int b = N - a;
+        Queue<Item> QueA = new Queue<>();
+        Queue<Item> QueB = new Queue<>();
+        for (int i = 0; i < a; i++) {
+            Item currItem = singleQue.dequeue().dequeue();
+            QueA.enqueue(currItem);
+        }
+        for (int i = 0; i < b; i++) {
+            Item currItem = singleQue.dequeue().dequeue();
+            QueB.enqueue(currItem);
+        }
+        return mergeSortedQueues(mergeSort(QueA), mergeSort(QueB));
+    }
+
+    public static void main(String[] args) {
+
+        /* test private methods. */
+        Queue<String> stringQ = new Queue<>();
+        stringQ.enqueue("I");
+        stringQ.enqueue("am");
+        stringQ.enqueue("not");
+        stringQ.enqueue("dog");
+        Queue<Queue<String>> SQ = makeSingleItemQueues(stringQ);
+        System.out.println(SQ.size());
     }
 }

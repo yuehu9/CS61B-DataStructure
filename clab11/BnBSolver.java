@@ -8,6 +8,13 @@ import java.util.List;
  * Given a list of Bears and a list of Beds, create lists of the same Bears and Beds where the ith Bear is the same
  * size as the ith Bed.
  */
+
+/**Note by Yue: use quickSort to solve it. Each time group the bed by <,=,> this bear (this bear 
+acting like pivot); next time compare with the pivot and decide with group to fall in; repeat).
+*/
+
+
+
 public class BnBSolver {
 
     public BnBSolver(List<Bear> bears, List<Bed> beds) {
