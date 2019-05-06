@@ -17,13 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static bearmaps.proj2c.utils.Constants.SEMANTIC_STREET_GRAPH;
-import static bearmaps.proj2c.utils.Constants.ROUTE_LIST;
+import static bearmaps.proj2c.utils.Constants.*;
 
 /**
  * Handles requests from the web browser for map images. These images
  * will be rastered into one large image to be displayed to the user.
- * @author rahul, Josh Hug, _________
+ * @author rahul, Josh Hug, ____Yue Hu_____
  */
 public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<String, Object>> {
 
@@ -84,13 +83,134 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
      */
     @Override
     public Map<String, Object> processRequest(Map<String, Double> requestParams, Response response) {
-        //System.out.println("yo, wanna know the parameters given by the web browser? They are:");
-        //System.out.println(requestParams);
+        System.out.println("yo, wanna know the parameters given by the web browser? They are:");
+        System.out.println(requestParams);
         Map<String, Object> results = new HashMap<>();
-        System.out.println("Since you haven't implemented RasterAPIHandler.processRequest, nothing is displayed in "
-                + "your browser.");
+        boolean valid = checkInputValid(requestParams);
+        if (!valid) {
+            results.put("query_success", valid);
+//            throw new IllegalArgumentException("invalid input");
+            System.out.println("invalide input");
+            return results;
+        }
+
+        double ullat = requestParams.get("ullat");
+        double ullon = requestParams.get("ullon");
+        double lrlat = requestParams.get("lrlat");
+        double lrlon = requestParams.get("lrlon");
+        double w = requestParams.get("w");
+
+        results.put("query_success", valid);
+        double targetDPP = (lrlon - ullon) / w;
+        int depth = findDepth(targetDPP);
+        int k = (int) Math.pow(2, depth) - 1;
+        int startX = Math.max(0, findNumX(depth, ullon));
+        int endX = Math.min(k, findNumX(depth, lrlon));
+        int startY = Math.max(0, findNumY(depth, ullat));
+        int endY = Math.min(k, findNumY(depth, lrlat));
+
+        int totalX = endX - startX + 1;
+        int totalY = endY - startY + 1;
+        String[][] render_grid = new String[totalY][totalX];
+        for (int i = 0; i < totalY; i++) {
+            for (int j = 0; j < totalX; j++) {
+                render_grid[i][j] = "d" + depth + "_x" + (j + startX) + "_y" + (i + startY) + ".png";
+            }
+        }
+        results.put("render_grid", render_grid);
+        results.put("depth", depth);
+
+        double[] ulTile = findTileBound(depth, startX, startY);
+        double[] lrTile = findTileBound(depth, endX, endY);
+        results.put("raster_ul_lon", ulTile[0]);
+        results.put("raster_ul_lat", ulTile[1]);
+        results.put("raster_lr_lon", lrTile[2]);
+        results.put("raster_lr_lat", lrTile[3]);
+
         return results;
     }
+
+
+    /** check if input is valid
+     * return false if the complete query is not covered,
+     * or ullon, ullat is located to the left of lrlon, lrlat
+     */
+    private boolean checkInputValid(Map<String, Double> requestParams) {
+        double ullat = requestParams.get("ullat");
+        double ullon = requestParams.get("ullon");
+        double lrlat = requestParams.get("lrlat");
+        double lrlon = requestParams.get("lrlon");
+
+        if (ullat < ROOT_LRLAT || ullon > ROOT_LRLON || lrlat > ROOT_ULLAT || lrlon < ROOT_ULLON) {
+            return false;
+        }
+        if (ullat < lrlat || ullon > lrlon) {
+            return false;
+        }
+        return true;
+    }
+
+    /** calculate the longitudinal distance per pixel
+     * deviding the total longitude cover by the total tiles, 2^D
+     */
+    private double calLonDPP(int depth) {
+        return (ROOT_LRLON - ROOT_ULLON) / (TILE_SIZE * Math.pow(2, depth));
+    }
+
+    /** calculate the latidudinal (vertical)  distance per pixel
+     */
+    private double calLatDPP(int depth) {
+        return (ROOT_ULLAT - ROOT_LRLAT) / (TILE_SIZE * Math.pow(2, depth));
+    }
+
+    /** find the depth given target distance per pixel (DPP),
+     * which is just smaller than the target DPP.
+     */
+    private int findDepth(double targetDPP) {
+        int depth = 0;
+        while (depth < 7 & calLonDPP(depth) > targetDPP) {
+            depth += 1;
+        }
+        return depth;
+    }
+
+    /** find the x coordinate of the tile containing target longitude
+     *
+     */
+    private int findNumX(int depth, double targetLon) {
+        double LonDDP = calLonDPP(depth);
+        int x = (int) Math.floor((targetLon - ROOT_ULLON) / (TILE_SIZE * LonDDP));
+        return x;
+    }
+
+    /** find the y coordinate of the tile containing target latitude
+     *
+     */
+    private int findNumY(int depth, double targetLat) {
+        double LatDDP = calLatDPP(depth);
+        int y = (int) Math.floor((ROOT_ULLAT - targetLat) / (TILE_SIZE * LatDDP));
+        return y;
+    }
+
+    /**
+     * find the bounding box latitude and longitude given a tile
+     * @param depth depth of the tile
+     * @param x number along x axis
+     * @param y number along y axis
+     * @return an array of 4 doubles indicatign the ullon, ullat, lrlon, lrlat of the tile
+     */
+    private double[] findTileBound(int depth, int x, int y) {
+        double[] bound = new double[4];
+        double LonDDP = calLonDPP(depth);
+        double LatDDP = calLatDPP(depth);
+        bound[0] = ROOT_ULLON + LonDDP * TILE_SIZE * x; // longitude left
+        bound[1] = ROOT_ULLAT - LatDDP * TILE_SIZE * y; // latitude up
+        bound[2] = ROOT_ULLON + LonDDP * TILE_SIZE * (x + 1); // longitude right
+        bound[3] = ROOT_ULLAT - LatDDP * TILE_SIZE * (y + 1); // latitude down
+        return bound;
+    }
+
+
 
     @Override
     protected Object buildJsonResponse(Map<String, Object> result) {
