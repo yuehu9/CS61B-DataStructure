@@ -2,10 +2,13 @@ package bearmaps.proj2c;
 
 import bearmaps.hw4.streetmap.Node;
 import bearmaps.hw4.streetmap.StreetMapGraph;
+import bearmaps.lab9.MyTrieSet;
+import bearmaps.lab9.TrieSet61B;
 import bearmaps.proj2ab.KDTree;
 import bearmaps.proj2ab.Point;
 import bearmaps.proj2ab.PointSet;
-
+//import bearmaps.lab9.MyTrieSet;
+//import bearmaps.lab9.TrieSet61B;
 import java.util.*;
 
 /**
@@ -18,6 +21,9 @@ import java.util.*;
 public class AugmentedStreetMapGraph extends StreetMapGraph {
     private List<Point> usefulPoints = new ArrayList<>();
     private HashMap<Point, Long> pointToNode = new HashMap<>();
+    private TrieSet61B nameTrie = new MyTrieSet();
+    private HashMap<String, String> cleanedToName = new HashMap<>();
+    private HashMap<String, List<Node>> nameToNode = new HashMap<>();
 
     public AugmentedStreetMapGraph(String dbPath) {
         super(dbPath);
@@ -29,6 +35,27 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
                 pointToNode.put(p, node.id());
             }
         }
+
+        for (Node node : nodes) {
+            if (node.name() != null) {
+                String cleanedName = cleanString(node.name());
+                cleanedToName.put(cleanedName, node.name());
+                nameTrie.add(cleanedName);
+
+                putNode(cleanedName, node, nameToNode);
+            }
+
+        }
+
+
+
+    }
+
+    private void putNode(String cleanedName, Node n, HashMap<String, List<Node>> map) {
+        List<Node> nodes = map.get(cleanedName);
+        if (nodes == null) { nodes = new ArrayList<>();}
+        nodes.add(n);
+        map.put(cleanedName, nodes);
     }
 
 
@@ -53,9 +80,17 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
      *               punctuation.
      * @return A <code>List</code> of the full names of locations whose cleaned name matches the
      * cleaned <code>prefix</code>.
+     *
+     * potential bug: if several name corresponds to the same cleaned name, only show one.
      */
     public List<String> getLocationsByPrefix(String prefix) {
-        return new LinkedList<>();
+        String cleanedPre = cleanString(prefix);
+        List<String> cleanedByPrefix = nameTrie.keysWithPrefix(cleanedPre);
+        List<String> nameByPrefix = new ArrayList<>();
+        for (String s : cleanedByPrefix) {
+            nameByPrefix.add(cleanedToName.get(s));
+        }
+        return nameByPrefix;
     }
 
     /**
@@ -72,7 +107,18 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
      * "id" -> Number, The id of the node. <br>
      */
     public List<Map<String, Object>> getLocations(String locationName) {
-        return new LinkedList<>();
+        List<Map<String, Object>> locations = new ArrayList<>();
+        List<Node> nodes = nameToNode.get(cleanString(locationName));
+        for (Node n : nodes) {
+            Map<String, Object> mymap = new HashMap<>();
+            mymap.put("lat", n.lat());
+            mymap.put("lon", n.lon());
+            mymap.put("name", n.name());
+            mymap.put("id", n.id());
+            locations.add(mymap);
+        }
+
+        return locations;
     }
 
 
